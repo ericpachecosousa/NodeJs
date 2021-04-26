@@ -4,37 +4,40 @@ import { UsersRepository } from "../repositories/UsersRepository";
 
 class UserService {
   
-  private messagesRepository: Repository<User>;
+  private usersRepository: Repository<User>;
 
   constructor() {
-    this.messagesRepository = getCustomRepository(UsersRepository);
+    this.usersRepository = getCustomRepository(UsersRepository);
   }
 
-  async create( email : string ) {
-    // VERIFICAR SE USUÁRIO EXISTE
-    const userExists = await this.findByEmail(email);
+  async create(email: string) {
+    // Verificar se usuario existe
 
-    // SE NÃO EXISTIR, SALVAR NO DB
-    if(userExists)
-      return userExists
+    const userExists = await this.usersRepository.findOne({
+      email,
+    });
 
-    const user = this.messagesRepository.create({
-      email
-    })
+    // Se existir, retornar user
+    if (userExists) {
+      return userExists;
+    }
 
-    await this.messagesRepository.save(user);
-    // SE EXISTIR, RETORNAR USER
+    const user = this.usersRepository.create({
+      email,
+    });
 
+    await this.usersRepository.save(user);
+
+    // Se não existir, salvar no DB
     return user;
   }
 
-  async findByEmail( email : string ) {
-    // VERIFICAR SE USUÁRIO EXISTE
-    return await this.messagesRepository.findOne({
-      email
+  async findByEmail(email: string) {
+    const user = await this.usersRepository.findOne({
+      email,
     });
+    return user;
   }
-
-
 }
-export { UserService }
+
+export { UserService };
